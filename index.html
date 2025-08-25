@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fokus - Productivity in Your Hands</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@6/dist/umd/react-router-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // Supabase configuration
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Shared components
+        const Container = ({ children, className = '' }) => (
+            <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${className}`}>
+                {children}
+            </div>
+        );
+
+        const Button = ({ variant = 'primary', size = 'md', onClick, href, children, className = '', ...props }) =>
+        {
+            const baseClasses = 'font-semibold rounded-lg transition-all duration-200 inline-block text-center';
+            const sizeClasses = {
+                sm: 'px-4 py-2 text-sm',
+                md: 'px-6 py-3 text-base',
+                lg: 'px-8 py-4 text-lg'
+            };
+            const variantClasses = {
+                primary: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl',
+                secondary: 'bg-white text-gray-900 border-2 border-gray-300 hover:border-gray-400',
+                outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50'
+            };
+
+            const classes = `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`;
+
+            if (href)
+            {
+                return <a href={href} className={classes} {...props}>{children}</a>;
+            }
+
+            return <button onClick={onClick} className={classes} {...props}>{children}</button>;
+        };
+
+        const Card = ({ children, className = '' }) => (
+            <div className={`bg-white rounded-xl shadow-lg p-8 ${className}`}>
+                {children}
+            </div>
+        );
+
+        const Input = ({ label, error, ...props }) => (
+            <div className="mb-4">
+                {label && <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>}
+                <input
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${error ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                    {...props}
+                />
+                {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+            </div>
+        );
+
+        // Navigation component
+        const Navigation = () =>
+        {
+            const location = useLocation();
+            const isMainPage = location.pathname === '/';
+
+            if (!isMainPage) return null;
+
+            return (
+                <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
+                    <Container className="py-4">
+                        <div className="flex justify-between items-center">
+                            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                                Fokus
+                            </div>
+                            <div className="flex gap-6">
+                                <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+                                <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+                                <Button variant="primary" size="sm" href="https://chrome.google.com/webstore">
+                                    Install Extension
+                                </Button>
+                            </div>
+                        </div>
+                    </Container>
+                </nav>
+            );
+        };
+
+        // Main landing page
+        const LandingPage = () =>
+        {
+            const navigate = useNavigate();
+            const stripeCheckoutUrl = 'https://checkout.stripe.com/YOUR_CHECKOUT_SESSION';
+
+            const features = [
+                {
+                    title: 'Block Keywords',
+                    description: 'Filter out distracting content by blocking specific keywords in Google search results',
+                    limit: { free: '10 keywords', paid: 'Unlimited keywords' }
+                },
+                {
+                    title: 'Block Domains',
+                    description: 'Stay focused by blocking access to time-wasting websites and domains',
+                    limit: { free: '10 domains', paid: 'Unlimited domains' }
+                },
+                {
+                    title: 'GitHub Blocklist Integration',
+                    description: 'Import curated blocklists from GitHub repositories like Steven Black\'s hosts file',
+                    limit: { free: '1 GitHub URL', paid: 'Unlimited GitHub URLs' }
+                },
+                {
+                    title: 'Focus Mode',
+                    description: 'Temporarily block all distracting websites with one click when you need deep focus',
+                    limit: { free: 'Available', paid: 'Advanced settings' }
+                }
+            ];
+
+            const pricingPlans = [
+                {
+                    name: 'Free',
+                    price: '0',
+                    period: 'forever',
+                    features: [
+                        '10 blocked keywords',
+                        '10 blocked domains',
+                        '1 GitHub blocklist URL',
+                        'Basic Focus Mode',
+                        '1 device sync'
+                    ],
+                    cta: 'Get Started',
+                    variant: 'outline'
+                },
+                {
+                    name: 'Pro',
+                    price: '4.99',
+                    period: 'month',
+                    features: [
+                        'Unlimited blocked keywords',
+                        'Unlimited blocked domains',
+                        'Unlimited GitHub blocklist URLs',
+                        'Advanced Focus Mode',
+                        '5 device sync',
+                        'Priority support',
+                        'Custom blocklist sharing'
+                    ],
+                    cta: 'Upgrade to Pro',
+                    variant: 'primary',
+                    popular: true
+                }
+            ];
+
+            return (
+                <>
+                    {/* Hero Section */}
+                    <section className="pt-32 pb-20 bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+                        <Container>
+                            <div className="text-center max-w-4xl mx-auto">
+                                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                                    Productivity in Your Hands
+                                </h1>
+                                <p className="text-xl text-gray-600 mb-8">
+                                    Take control of your browsing experience with Fokus. Block distractions,
+                                    filter search results, and stay focused on what matters most.
+                                </p>
+                                <div className="flex gap-4 justify-center">
+                                    <Button variant="primary" size="lg" href="https://chrome.google.com/webstore">
+                                        Add to Chrome - It's Free
+                                    </Button>
+                                    <Button variant="secondary" size="lg" href="#features">
+                                        Learn More
+                                    </Button>
+                                </div>
+                            </div>
+                        </Container>
+                    </section>
+
+                    {/* Features Section */}
+                    <section id="features" className="py-20 bg-white">
+                        <Container>
+                            <div className="text-center mb-16">
+                                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                    Powerful Features for Deep Focus
+                                </h2>
+                                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                                    Everything you need to eliminate distractions and boost your productivity
+                                </p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {features.map((feature, i) => (
+                                    <Card key={i} className="hover:shadow-xl transition-shadow">
+                                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-gray-600 mb-4">
+                                            {feature.description}
+                                        </p>
+                                        <div className="flex gap-4 text-sm">
+                                            <span className="px-3 py-1 bg-gray-100 rounded-full text-gray-700">
+                                                Free: {feature.limit.free}
+                                            </span>
+                                            <span className="px-3 py-1 bg-purple-100 rounded-full text-purple-700">
+                                                Pro: {feature.limit.paid}
+                                            </span>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        </Container>
+                    </section>
+
+                    {/* Pricing Section */}
+                    <section id="pricing" className="py-20 bg-gray-50">
+                        <Container>
+                            <div className="text-center mb-16">
+                                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                                    Simple, Transparent Pricing
+                                </h2>
+                                <p className="text-lg text-gray-600">
+                                    Start free, upgrade when you need more power
+                                </p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                {pricingPlans.map((plan, i) => (
+                                    <Card key={i} className={`relative ${plan.popular ? 'border-2 border-purple-500' : ''}`}>
+                                        {plan.popular && (
+                                            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                                <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                                    Most Popular
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        <div className="text-center mb-6">
+                                            <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                                            <div className="flex items-baseline justify-center gap-1">
+                                                <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
+                                                <span className="text-gray-600">/{plan.period}</span>
+                                            </div>
+                                        </div>
+
+                                        <ul className="space-y-3 mb-8">
+                                            {plan.features.map((feature, j) => (
+                                                <li key={j} className="flex items-start">
+                                                    <span className="text-green-500 mr-2">✓</span>
+                                                    <span className="text-gray-700">{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <Button
+                                            variant={plan.variant}
+                                            size="md"
+                                            className="w-full"
+                                            href={plan.name === 'Pro' ? stripeCheckoutUrl : 'https://chrome.google.com/webstore'}
+                                        >
+                                            {plan.cta}
+                                        </Button>
+                                    </Card>
+                                ))}
+                            </div>
+                        </Container>
+                    </section>
+
+                    {/* Footer */}
+                    <footer className="py-12 bg-gray-900 text-white">
+                        <Container>
+                            <div className="text-center">
+                                <div className="text-2xl font-bold mb-4">Fokus</div>
+                                <p className="text-gray-400 mb-4">
+                                    © 2025 Fokus. All rights reserved.
+                                </p>
+                                <div className="flex gap-6 justify-center text-gray-400">
+                                    <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+                                    <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
+                                    <a href="mailto:support@fokus.app" className="hover:text-white transition-colors">Contact</a>
+                                </div>
+                            </div>
+                        </Container>
+                    </footer>
+                </>
+            );
+        };
+
+        // Password Reset Page
+        const PasswordReset = () =>
+        {
+            const [password, setPassword] = useState('');
+            const [confirmPassword, setConfirmPassword] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [message, setMessage] = useState('');
+            const [error, setError] = useState('');
+            const navigate = useNavigate();
+
+            const handlePasswordReset = async (e) =>
+            {
+                e.preventDefault();
+                setError('');
+                setMessage('');
+
+                if (password !== confirmPassword)
+                {
+                    setError('Passwords do not match');
+                    return;
+                }
+
+                if (password.length < 8)
+                {
+                    setError('Password must be at least 8 characters');
+                    return;
+                }
+
+                setLoading(true);
+
+                try
+                {
+                    const { error } = await supabase.auth.updateUser({ password });
+
+                    if (error) throw error;
+
+                    setMessage('Password updated successfully! Redirecting...');
+                    setTimeout(() => navigate('/'), 3000);
+                } catch (err)
+                {
+                    setError(err.message || 'Failed to reset password');
+                } finally
+                {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center py-12">
+                    <Container>
+                        <div className="max-w-md mx-auto">
+                            <Card>
+                                <div className="text-center mb-8">
+                                    <Link to="/" className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                                        Fokus
+                                    </Link>
+                                    <h2 className="text-2xl font-semibold text-gray-900 mt-4">Reset Your Password</h2>
+                                    <p className="text-gray-600 mt-2">Enter your new password below</p>
+                                </div>
+
+                                <form onSubmit={handlePasswordReset}>
+                                    <Input
+                                        label="New Password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter new password"
+                                        required
+                                    />
+
+                                    <Input
+                                        label="Confirm Password"
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="Confirm new password"
+                                        required
+                                    />
+
+                                    {error && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+                                            {error}
+                                        </div>
+                                    )}
+
+                                    {message && (
+                                        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+                                            {message}
+                                        </div>
+                                    )}
+
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        size="md"
+                                        className="w-full"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Updating...' : 'Update Password'}
+                                    </Button>
+                                </form>
+
+                                <div className="mt-6 text-center">
+                                    <Link to="/" className="text-purple-600 hover:text-purple-700 text-sm">
+                                        Back to Home
+                                    </Link>
+                                </div>
+                            </Card>
+                        </div>
+                    </Container>
+                </div>
+            );
+        };
+
+        // Email Confirmation Page
+        const EmailConfirmation = () =>
+        {
+            const [status, setStatus] = useState('verifying');
+            const navigate = useNavigate();
+
+            useEffect(() =>
+            {
+                const verifyEmail = async () =>
+                {
+                    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                    const accessToken = hashParams.get('access_token');
+
+                    if (accessToken)
+                    {
+                        try
+                        {
+                            const { data, error } = await supabase.auth.getUser(accessToken);
+
+                            if (error) throw error;
+
+                            setStatus('success');
+                            setTimeout(() => navigate('/'), 5000);
+                        } catch (err)
+                        {
+                            setStatus('error');
+                        }
+                    } else
+                    {
+                        setStatus('error');
+                    }
+                };
+
+                verifyEmail();
+            }, [navigate]);
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center py-12">
+                    <Container>
+                        <div className="max-w-md mx-auto">
+                            <Card className="text-center">
+                                <Link to="/" className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent inline-block mb-6">
+                                    Fokus
+                                </Link>
+
+                                {status === 'verifying' && (
+                                    <>
+                                        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verifying Email</h2>
+                                        <p className="text-gray-600">Please wait while we confirm your email address...</p>
+                                    </>
+                                )}
+
+                                {status === 'success' && (
+                                    <>
+                                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <span className="text-green-600 text-3xl">✓</span>
+                                        </div>
+                                        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Email Confirmed!</h2>
+                                        <p className="text-gray-600 mb-4">Your email has been successfully verified.</p>
+                                        <p className="text-sm text-gray-500">Redirecting to home page in 5 seconds...</p>
+                                        <Button variant="primary" size="md" className="mt-6" onClick={() => navigate('/')}>
+                                            Go to Home Now
+                                        </Button>
+                                    </>
+                                )}
+
+                                {status === 'error' && (
+                                    <>
+                                        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <span className="text-red-600 text-3xl">×</span>
+                                        </div>
+                                        <h2 className="text-2xl font-semibold text-gray-900 mb-2">Verification Failed</h2>
+                                        <p className="text-gray-600 mb-4">
+                                            We couldn't verify your email address. The link may have expired or is invalid.
+                                        </p>
+                                        <Button variant="primary" size="md" onClick={() => navigate('/')}>
+                                            Return to Home
+                                        </Button>
+                                    </>
+                                )}
+                            </Card>
+                        </div>
+                    </Container>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () =>
+        {
+            return (
+                <BrowserRouter>
+                    <Navigation />
+                    <Routes>
+                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/reset-password" element={<PasswordReset />} />
+                        <Route path="/confirm-email" element={<EmailConfirmation />} />
+                    </Routes>
+                </BrowserRouter>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
