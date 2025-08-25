@@ -24,17 +24,67 @@
         </div>
     </nav>
 
-    <main id="app"></main>
+    <main id="app">
+        <!-- Loading state -->
+        <div class="auth-page">
+            <div class="container">
+                <div class="auth-container text-center">
+                    <div class="spinner"></div>
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <!-- External Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Core Application Files -->
     <script src="config.js"></script>
     <script src="utils.js"></script>
     <script src="components.js"></script>
     <script src="router.js"></script>
+
+    <!-- Page Components -->
     <script src="pages/landing.js"></script>
     <script src="pages/password-reset.js"></script>
     <script src="pages/email-confirmation.js"></script>
+
+    <!-- Main Application -->
     <script src="app.js"></script>
+
+    <!-- Initialize App after all scripts are loaded -->
+    <script>
+        // Ensure all scripts are loaded before initializing
+        window.addEventListener('load', function ()
+        {
+            // Double-check that all required objects exist
+            if (typeof App !== 'undefined' &&
+                typeof LandingPage !== 'undefined' &&
+                typeof PasswordResetPage !== 'undefined' &&
+                typeof EmailConfirmationPage !== 'undefined')
+            {
+
+                // Initialize the application
+                App.init();
+            } else
+            {
+                console.error('Required scripts not loaded properly');
+                // Show error to user
+                document.getElementById('app').innerHTML = `
+                    <div class="auth-page">
+                        <div class="container">
+                            <div class="auth-container text-center">
+                                <h2>Loading Error</h2>
+                                <p>Some files failed to load. Please refresh the page.</p>
+                                <button onclick="location.reload()" class="btn btn-primary">Refresh</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
 
 </html>

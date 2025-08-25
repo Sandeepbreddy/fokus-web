@@ -23,10 +23,10 @@ const App = {
     {
         // Define application routes
         router
-            .route('/', () => LandingPage.render())
-            .route('/reset-password', () => PasswordResetPage.render())
-            .route('/confirm-email', () => EmailConfirmationPage.render())
-            .route('*', () => this.handle404());
+            .route('/', function () { LandingPage.render(); })
+            .route('/reset-password', function () { PasswordResetPage.render(); })
+            .route('/confirm-email', function () { EmailConfirmationPage.render(); })
+            .route('*', function () { App.handle404(); });
     },
 
     setupAuthListener()
@@ -213,11 +213,5 @@ const App = {
     }
 };
 
-// Initialize app when DOM is ready
-if (document.readyState === 'loading')
-{
-    document.addEventListener('DOMContentLoaded', () => App.init());
-} else
-{
-    App.init();
-}
+// App initialization is now handled in index.html to ensure all scripts are loaded
+// The App.init() method is called from index.html after window.load event
