@@ -2,8 +2,9 @@
 const Config = {
     // Supabase Configuration
     supabase: {
-        url: 'YOUR_SUPABASE_URL',
-        anonKey: 'YOUR_SUPABASE_ANON_KEY'
+        url: 'https://llefxcwqdhrmvestoqvh.supabase.co', // Replace with your Supabase URL
+        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsZWZ4Y3dxZGhybXZlc3RvcXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5OTA3MTQsImV4cCI6MjA3MTU2NjcxNH0.TxuNrzg4SqHwdA9LMI7x-5_Ufmqz2axBYw8ZX2lZrPQ', // Replace with your Supabase anon key
+
     },
     // Stripe Configuration
     stripe: {
