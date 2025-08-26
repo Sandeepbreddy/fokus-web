@@ -3,26 +3,327 @@
 const App = {
     init()
     {
-        // Check current path
-        const path = window.location.pathname;
+        console.log('App initializing...');
 
-        // Handle routing based on URL
-        if (path === '/reset-password' || window.location.hash.includes('recovery'))
+        // Initialize Supabase if config exists
+        if (typeof Config !== 'undefined' && window.supabase)
         {
-            this.loadPasswordReset();
-        } else if (path === '/confirm-email' || window.location.hash.includes('confirmation'))
-        {
-            this.loadEmailConfirmation();
-        } else
-        {
-            this.loadLandingPage();
+            window.supabaseClient = window.supabase.createClient(
+                Config.supabase.url,
+                Config.supabase.anonKey
+            );
         }
 
-        // Initialize Supabase auth listener
+        // Set up routes first
+        this.setupRoutes();
+
+        // Initialize router
+        if (typeof router !== 'undefined')
+        {
+            router.init();
+        }
+
+        // Set up auth listener
         this.setupAuthListener();
 
         // Set up global error handling
         this.setupErrorHandling();
+    },
+
+    setupRoutes()
+    {
+        console.log('Setting up routes...');
+
+        // Check URL for routing
+        const path = window.location.pathname;
+        const hash = window.location.hash;
+
+        console.log('Current path:', path);
+        console.log('Current hash:', hash);
+
+        // Handle hash-based routing for Supabase callbacks
+        if (hash)
+        {
+            const hashParams = new URLSearchParams(hash.substring(1));
+            const type = hashParams.get('type');
+            const error = hashParams.get('error');
+
+            if (type === 'recovery' || path === '/reset-password')
+            {
+                console.log('Loading password reset page...');
+                this.loadPasswordResetPage();
+                return;
+            } else if (type === 'signup' || type === 'email' || path === '/confirm-email')
+            {
+                console.log('Loading email confirmation page...');
+                this.loadEmailConfirmationPage();
+                return;
+            }
+        }
+
+        // Handle direct path navigation
+        if (path === '/reset-password')
+        {
+            console.log('Direct navigation to password reset');
+            this.loadPasswordResetPage();
+        } else if (path === '/confirm-email')
+        {
+            console.log('Direct navigation to email confirmation');
+            this.loadEmailConfirmationPage();
+        } else
+        {
+            console.log('Loading landing page features...');
+            this.initLandingPage();
+        }
+    },
+
+    loadPasswordResetPage()
+    {
+        const app = document.getElementById('app');
+        if (!app) return;
+
+        // Hide navigation
+        const nav = document.getElementById('navigation');
+        if (nav) nav.style.display = 'none';
+
+        // Clear current content and load password reset page
+        app.innerHTML = `
+            <div class="auth-page">
+                <div class="container">
+                    <div class="auth-container">
+                        <div class="card">
+                            <div class="auth-header">
+                                <a href="/" class="auth-logo">FOKUS</a>
+                                <h2 class="auth-title">Reset Your Password</h2>
+                                <p class="auth-subtitle">Enter your new password below</p>
+                            </div>
+                            
+                            <form id="password-reset-form">
+                                <div class="form-group">
+                                    <label class="form-label" for="password">New Password</label>
+                                    <input 
+                                        type="password" 
+                                        id="password" 
+                                        name="password" 
+                                        class="form-input" 
+                                        placeholder="Enter new password" 
+                                        required
+                                        minlength="8"
+                                    />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label" for="confirmPassword">Confirm Password</label>
+                                    <input 
+                                        type="password" 
+                                        id="confirmPassword" 
+                                        name="confirmPassword" 
+                                        class="form-input" 
+                                        placeholder="Confirm new password" 
+                                        required
+                                        minlength="8"
+                                    />
+                                </div>
+                                
+                                <div id="form-messages"></div>
+                                
+                                <button type="submit" class="btn btn-primary btn-full">
+                                    Update Password
+                                </button>
+                            </form>
+                            
+                            <div class="auth-footer">
+                                <a href="/" class="auth-footer-link">Back to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Attach form handler
+        const form = document.getElementById('password-reset-form');
+        if (form)
+        {
+            form.addEventListener('submit', async (e) =>
+            {
+                e.preventDefault();
+                await this.handlePasswordReset(e);
+            });
+        }
+    },
+
+    loadEmailConfirmationPage()
+    {
+        const app = document.getElementById('app');
+        if (!app) return;
+
+        // Hide navigation
+        const nav = document.getElementById('navigation');
+        if (nav) nav.style.display = 'none';
+
+        // Clear current content and load confirmation page
+        app.innerHTML = `
+            <div class="auth-page">
+                <div class="container">
+                    <div class="auth-container">
+                        <div class="card text-center">
+                            <a href="/" class="auth-logo">FOKUS</a>
+                            <div id="confirmation-content" class="mt-6">
+                                <div class="spinner"></div>
+                                <h2 class="auth-title">Verifying Email</h2>
+                                <p class="auth-subtitle">Please wait while we confirm your email address...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Start verification
+        this.verifyEmail();
+    },
+
+    async handlePasswordReset(e)
+    {
+        const form = e.target;
+        const messagesDiv = document.getElementById('form-messages');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        // Get form data
+        const password = form.password.value;
+        const confirmPassword = form.confirmPassword.value;
+
+        // Clear previous messages
+        messagesDiv.innerHTML = '';
+
+        // Validate passwords match
+        if (password !== confirmPassword)
+        {
+            messagesDiv.innerHTML = `
+                <div class="alert alert-error">Passwords do not match</div>
+            `;
+            return;
+        }
+
+        // Validate password length
+        if (password.length < 8)
+        {
+            messagesDiv.innerHTML = `
+                <div class="alert alert-error">Password must be at least 8 characters</div>
+            `;
+            return;
+        }
+
+        // Update button state
+        submitButton.disabled = true;
+        submitButton.textContent = 'Updating...';
+
+        try
+        {
+            // Update password using Supabase
+            if (window.supabaseClient)
+            {
+                const { error } = await window.supabaseClient.auth.updateUser({
+                    password: password
+                });
+
+                if (error) throw error;
+            }
+
+            // Show success message
+            messagesDiv.innerHTML = `
+                <div class="alert alert-success">Password updated successfully! Redirecting...</div>
+            `;
+
+            // Redirect after 3 seconds
+            setTimeout(() =>
+            {
+                window.location.href = '/';
+            }, 3000);
+
+        } catch (error)
+        {
+            messagesDiv.innerHTML = `
+                <div class="alert alert-error">${error.message || 'Failed to reset password'}</div>
+            `;
+
+            // Re-enable button
+            submitButton.disabled = false;
+            submitButton.textContent = 'Update Password';
+        }
+    },
+
+    async verifyEmail()
+    {
+        const contentDiv = document.getElementById('confirmation-content');
+        if (!contentDiv) return;
+
+        try
+        {
+            // Get hash parameters from URL
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = hashParams.get('access_token');
+            const type = hashParams.get('type');
+
+            // Check if this is an email confirmation
+            if (type === 'signup' || type === 'email')
+            {
+                if (accessToken && window.supabaseClient)
+                {
+                    // Verify the token with Supabase
+                    const { data, error } = await window.supabaseClient.auth.getUser(accessToken);
+
+                    if (error) throw error;
+
+                    // Update status to success
+                    contentDiv.innerHTML = `
+                        <div class="status-icon status-icon-success">✓</div>
+                        <h2 class="auth-title">Email Confirmed!</h2>
+                        <p class="auth-subtitle mb-4">Your email has been successfully verified.</p>
+                        <p class="text-sm text-gray-500">Redirecting to home page in 5 seconds...</p>
+                        <a href="/" class="btn btn-primary mt-6">Go to Home Now</a>
+                    `;
+
+                    // Redirect after 5 seconds
+                    setTimeout(() =>
+                    {
+                        window.location.href = '/';
+                    }, 5000);
+
+                } else
+                {
+                    throw new Error('No access token found in URL');
+                }
+            } else if (type === 'recovery')
+            {
+                // This is a password reset link, redirect to password reset page
+                window.location.href = '/reset-password';
+            } else
+            {
+                throw new Error('Invalid confirmation type');
+            }
+
+        } catch (error)
+        {
+            console.error('Email verification error:', error);
+
+            contentDiv.innerHTML = `
+                <div class="status-icon status-icon-error">×</div>
+                <h2 class="auth-title">Verification Failed</h2>
+                <p class="auth-subtitle mb-4">
+                    ${error.message || 'We couldn\'t verify your email address. The link may have expired or is invalid.'}
+                </p>
+                <a href="/" class="btn btn-primary">Return to Home</a>
+            `;
+        }
+    },
+
+    initLandingPage()
+    {
+        // Show navigation
+        const nav = document.getElementById('navigation');
+        if (nav) nav.style.display = '';
 
         // Initialize smooth scrolling
         this.initSmoothScroll();
@@ -35,45 +336,23 @@ const App = {
 
         // Handle scroll effects
         this.handleScrollEffects();
-    },
 
-    loadLandingPage()
-    {
-        // Landing page is already in HTML, just initialize interactions
-        this.initLandingPageInteractions();
-    },
-
-    loadPasswordReset()
-    {
-        if (typeof PasswordResetPage !== 'undefined')
-        {
-            PasswordResetPage.render();
-        }
-    },
-
-    loadEmailConfirmation()
-    {
-        if (typeof EmailConfirmationPage !== 'undefined')
-        {
-            EmailConfirmationPage.render();
-        }
-    },
-
-    initLandingPageInteractions()
-    {
-        // Add animation on scroll
+        // Initialize animations
         this.initScrollAnimations();
 
-        // Initialize FAQ interactions
-        this.initFAQ();
+        // Initialize landing page features if available
+        if (typeof LandingPage !== 'undefined')
+        {
+            LandingPage.init();
+        }
     },
 
     setupAuthListener()
     {
         // Listen for auth state changes
-        if (typeof supabase !== 'undefined')
+        if (window.supabaseClient)
         {
-            supabase.auth.onAuthStateChange((event, session) =>
+            window.supabaseClient.auth.onAuthStateChange((event, session) =>
             {
                 console.log('Auth event:', event);
 
@@ -81,26 +360,16 @@ const App = {
                 {
                     case 'PASSWORD_RECOVERY':
                         // User clicked password recovery link
-                        this.loadPasswordReset();
+                        this.loadPasswordResetPage();
                         break;
                     case 'USER_UPDATED':
                         // User's data was updated
-                        this.handleUserUpdate(session);
+                        if (session)
+                        {
+                            console.log('User updated:', session.user.email);
+                        }
                         break;
                 }
-            });
-        }
-    },
-
-    handleUserUpdate(session)
-    {
-        if (session)
-        {
-            // Store user data if needed
-            Utils.storage.set('fokus_user', {
-                id: session.user.id,
-                email: session.user.email,
-                confirmed: session.user.confirmed_at !== null
             });
         }
     },
@@ -172,6 +441,7 @@ const App = {
     handleScrollEffects()
     {
         const nav = document.querySelector('.navigation');
+        if (!nav) return;
 
         window.addEventListener('scroll', () =>
         {
@@ -198,13 +468,14 @@ const App = {
             {
                 if (entry.isIntersecting)
                 {
-                    entry.target.classList.add('animated');
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
                     observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);
 
-        // Observe all feature cards and other animated elements
+        // Observe all animated elements
         document.querySelectorAll('.feature-card, .step, .pricing-card, .faq-item').forEach(el =>
         {
             el.style.opacity = '0';
@@ -214,83 +485,16 @@ const App = {
         });
     },
 
-    initFAQ()
-    {
-        // Make FAQ items clickable for expansion (optional enhancement)
-        const faqItems = document.querySelectorAll('.faq-item');
-
-        faqItems.forEach(item =>
-        {
-            const question = item.querySelector('.faq-question');
-            if (question)
-            {
-                question.style.cursor = 'pointer';
-                question.addEventListener('click', () =>
-                {
-                    item.classList.toggle('expanded');
-                });
-            }
-        });
-    },
-
     setupErrorHandling()
     {
-        // Global error handler
         window.addEventListener('error', (event) =>
         {
             console.error('Global error:', event.error);
-
-            // Log to error tracking service in production
-            if (window.location.hostname !== 'localhost')
-            {
-                this.logError(event.error);
-            }
         });
 
-        // Unhandled promise rejection handler
         window.addEventListener('unhandledrejection', (event) =>
         {
             console.error('Unhandled promise rejection:', event.reason);
-
-            // Log to error tracking service in production
-            if (window.location.hostname !== 'localhost')
-            {
-                this.logError(event.reason);
-            }
         });
-    },
-
-    logError(error)
-    {
-        // In production, send this to your error tracking service
-        const errorData = {
-            message: error.message || error,
-            stack: error.stack,
-            url: window.location.href,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent
-        };
-
-        // Store errors locally as fallback
-        const errors = Utils.storage.get('fokus_errors') || [];
-        errors.push(errorData);
-
-        // Keep only last 10 errors
-        if (errors.length > 10)
-        {
-            errors.shift();
-        }
-
-        Utils.storage.set('fokus_errors', errors);
     }
 };
-
-// Add CSS class when elements come into view
-const style = document.createElement('style');
-style.textContent = `
-    .animated {
-        opacity: 1 !important;
-        transform: translateY(0) !important;
-    }
-`;
-document.head.appendChild(style);
