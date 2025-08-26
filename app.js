@@ -3,86 +3,92 @@
 const App = {
     init()
     {
-        // Set up routes
-        this.setupRoutes();
+        // Check current path
+        const path = window.location.pathname;
+
+        // Handle routing based on URL
+        if (path === '/reset-password' || window.location.hash.includes('recovery'))
+        {
+            this.loadPasswordReset();
+        } else if (path === '/confirm-email' || window.location.hash.includes('confirmation'))
+        {
+            this.loadEmailConfirmation();
+        } else
+        {
+            this.loadLandingPage();
+        }
 
         // Initialize Supabase auth listener
         this.setupAuthListener();
 
-        // Handle initial route
-        router.init();
-
         // Set up global error handling
         this.setupErrorHandling();
 
-        // Make router globally accessible for onclick handlers
-        window.router = router;
+        // Initialize smooth scrolling
+        this.initSmoothScroll();
+
+        // Initialize pricing toggle
+        this.initPricingToggle();
+
+        // Initialize mobile menu
+        this.initMobileMenu();
+
+        // Handle scroll effects
+        this.handleScrollEffects();
     },
 
-    setupRoutes()
+    loadLandingPage()
     {
-        // Define application routes
-        router
-            .route('/', function () { LandingPage.render(); })
-            .route('/reset-password', function () { PasswordResetPage.render(); })
-            .route('/confirm-email', function () { EmailConfirmationPage.render(); })
-            .route('*', function () { App.handle404(); });
+        // Landing page is already in HTML, just initialize interactions
+        this.initLandingPageInteractions();
+    },
+
+    loadPasswordReset()
+    {
+        if (typeof PasswordResetPage !== 'undefined')
+        {
+            PasswordResetPage.render();
+        }
+    },
+
+    loadEmailConfirmation()
+    {
+        if (typeof EmailConfirmationPage !== 'undefined')
+        {
+            EmailConfirmationPage.render();
+        }
+    },
+
+    initLandingPageInteractions()
+    {
+        // Add animation on scroll
+        this.initScrollAnimations();
+
+        // Initialize FAQ interactions
+        this.initFAQ();
     },
 
     setupAuthListener()
     {
         // Listen for auth state changes
-        supabase.auth.onAuthStateChange((event, session) =>
+        if (typeof supabase !== 'undefined')
         {
-            console.log('Auth event:', event);
-
-            switch (event)
+            supabase.auth.onAuthStateChange((event, session) =>
             {
-                case 'SIGNED_IN':
-                    this.handleSignIn(session);
-                    break;
-                case 'SIGNED_OUT':
-                    this.handleSignOut();
-                    break;
-                case 'PASSWORD_RECOVERY':
-                    // User clicked password recovery link
-                    router.navigate('/reset-password');
-                    break;
-                case 'USER_UPDATED':
-                    // User's data was updated
-                    this.handleUserUpdate(session);
-                    break;
-            }
-        });
-    },
+                console.log('Auth event:', event);
 
-    handleSignIn(session)
-    {
-        if (session)
-        {
-            // Store user session
-            Utils.storage.set('fokus_user', {
-                id: session.user.id,
-                email: session.user.email,
-                confirmed: session.user.confirmed_at !== null
+                switch (event)
+                {
+                    case 'PASSWORD_RECOVERY':
+                        // User clicked password recovery link
+                        this.loadPasswordReset();
+                        break;
+                    case 'USER_UPDATED':
+                        // User's data was updated
+                        this.handleUserUpdate(session);
+                        break;
+                }
             });
-
-            // Check if user has pro subscription
-            this.checkSubscription(session.user.id);
-        }
-    },
-
-    handleSignOut()
-    {
-        // Clear stored user data
-        Utils.storage.remove('fokus_user');
-        Utils.storage.remove('fokus_subscription');
-
-        // Redirect to home if on protected route
-        const protectedRoutes = ['/dashboard', '/settings'];
-        if (protectedRoutes.includes(router.getCurrentRoute()))
-        {
-            router.navigate('/');
         }
     },
 
@@ -90,7 +96,7 @@ const App = {
     {
         if (session)
         {
-            // Update stored user data
+            // Store user data if needed
             Utils.storage.set('fokus_user', {
                 id: session.user.id,
                 email: session.user.email,
@@ -99,46 +105,132 @@ const App = {
         }
     },
 
-    async checkSubscription(userId)
+    initSmoothScroll()
     {
-        try
+        document.querySelectorAll('a[href^="#"]').forEach(anchor =>
         {
-            // This would typically check your database for subscription status
-            // For now, we'll just store a placeholder
-            const subscription = {
-                plan: 'free',
-                expires_at: null
-            };
+            anchor.addEventListener('click', function (e)
+            {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target)
+                {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    },
 
-            Utils.storage.set('fokus_subscription', subscription);
-        } catch (error)
+    initPricingToggle()
+    {
+        const toggle = document.getElementById('pricing-toggle');
+        if (toggle)
         {
-            console.error('Error checking subscription:', error);
+            toggle.addEventListener('click', function ()
+            {
+                this.classList.toggle('active');
+
+                // Update prices
+                const isYearly = this.classList.contains('active');
+                const priceElements = document.querySelectorAll('[data-monthly]');
+
+                priceElements.forEach(el =>
+                {
+                    const monthly = el.getAttribute('data-monthly');
+                    const yearly = el.getAttribute('data-yearly');
+                    el.textContent = isYearly ? yearly : monthly;
+                });
+
+                // Update period text
+                const periodElements = document.querySelectorAll('.period');
+                periodElements.forEach(el =>
+                {
+                    el.textContent = isYearly ? '/year' : '/month';
+                });
+            });
         }
     },
 
-    handle404()
+    initMobileMenu()
     {
-        const app = Utils.$('#app');
-        app.innerHTML = `
-            <div class="auth-page">
-                <div class="container">
-                    <div class="auth-container text-center">
-                        ${Components.Card({
-            children: `
-                                <h1 class="auth-title">404 - Page Not Found</h1>
-                                <p class="auth-subtitle mb-4">The page you're looking for doesn't exist.</p>
-                                ${Components.Button({
-                text: 'Go to Home',
-                variant: 'primary',
-                onclick: "router.navigate('/')"
-            })}
-                            `
-        })}
-                    </div>
-                </div>
-            </div>
-        `;
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (toggle && navLinks)
+        {
+            toggle.addEventListener('click', () =>
+            {
+                navLinks.classList.toggle('mobile-active');
+                toggle.classList.toggle('active');
+            });
+        }
+    },
+
+    handleScrollEffects()
+    {
+        const nav = document.querySelector('.navigation');
+
+        window.addEventListener('scroll', () =>
+        {
+            if (window.scrollY > 100)
+            {
+                nav.classList.add('scrolled');
+            } else
+            {
+                nav.classList.remove('scrolled');
+            }
+        });
+    },
+
+    initScrollAnimations()
+    {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) =>
+        {
+            entries.forEach(entry =>
+            {
+                if (entry.isIntersecting)
+                {
+                    entry.target.classList.add('animated');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards and other animated elements
+        document.querySelectorAll('.feature-card, .step, .pricing-card, .faq-item').forEach(el =>
+        {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    },
+
+    initFAQ()
+    {
+        // Make FAQ items clickable for expansion (optional enhancement)
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item =>
+        {
+            const question = item.querySelector('.faq-question');
+            if (question)
+            {
+                question.style.cursor = 'pointer';
+                question.addEventListener('click', () =>
+                {
+                    item.classList.toggle('expanded');
+                });
+            }
+        });
     },
 
     setupErrorHandling()
@@ -170,8 +262,7 @@ const App = {
 
     logError(error)
     {
-        // In production, you would send this to your error tracking service
-        // For example: Sentry, LogRocket, etc.
+        // In production, send this to your error tracking service
         const errorData = {
             message: error.message || error,
             stack: error.stack,
@@ -191,27 +282,15 @@ const App = {
         }
 
         Utils.storage.set('fokus_errors', errors);
-    },
-
-    // Utility method to check if user is authenticated
-    isAuthenticated()
-    {
-        const user = Utils.storage.get('fokus_user');
-        return user && user.confirmed;
-    },
-
-    // Utility method to get current user
-    getCurrentUser()
-    {
-        return Utils.storage.get('fokus_user');
-    },
-
-    // Utility method to get subscription status
-    getSubscription()
-    {
-        return Utils.storage.get('fokus_subscription') || { plan: 'free' };
     }
 };
 
-// App initialization is now handled in index.html to ensure all scripts are loaded
-// The App.init() method is called from index.html after window.load event
+// Add CSS class when elements come into view
+const style = document.createElement('style');
+style.textContent = `
+    .animated {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+`;
+document.head.appendChild(style);

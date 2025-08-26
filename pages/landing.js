@@ -1,96 +1,154 @@
-// Landing page for Fokus app
+// Landing page specific functionality for Fokus app
 
 const LandingPage = {
-render() {
-const app = Utils.$('#app');
+    init()
+    {
+        // Initialize all landing page features
+        this.initHeroAnimations();
+        this.initFeatureCards();
+        this.initStats();
+        this.initTestimonials();
+    },
 
-// Show navigation
-Utils.show(Utils.$('#navigation'));
+    initHeroAnimations()
+    {
+        // Animate hero elements on load
+        const heroElements = document.querySelectorAll('.hero-title, .hero-subtitle, .hero-buttons');
+        heroElements.forEach((el, index) =>
+        {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            setTimeout(() =>
+            {
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
 
-// Build page HTML
-const html = `
-${Components.Hero({
-title: 'Productivity in Your Hands',
-subtitle: 'Take control of your browsing experience with Fokus. Block distractions, filter search results, and stay
-focused on what matters most.',
-buttons: [
-{
-text: "Add to Chrome - It's Free",
-variant: 'primary',
-size: 'lg',
-href: Config.chromeExtensionUrl
-},
-{
-text: 'Learn More',
-variant: 'secondary',
-size: 'lg',
-href: '#features'
-}
-]
-})}
+        // Animate stats counter
+        this.animateStats();
+    },
 
-${Components.Section({
-id: 'features',
-title: 'Powerful Features for Deep Focus',
-subtitle: 'Everything you need to eliminate distractions and boost your productivity',
-children: `
-<div class="grid grid-2">
-    ${Config.features.map(feature =>
-    Components.FeatureCard(feature)
-    ).join('')}
-</div>
-`
-})}
+    initFeatureCards()
+    {
+        const cards = document.querySelectorAll('.feature-card');
 
-${Components.Section({
-id: 'pricing',
-title: 'Simple, Transparent Pricing',
-subtitle: 'Start free, upgrade when you need more power',
-className: 'section-gray',
-children: `
-<div class="pricing-grid">
-    ${Components.PricingCard({
-    name: Config.pricing.free.name,
-    price: Config.pricing.free.price,
-    period: Config.pricing.free.period,
-    features: Config.pricing.free.features,
-    variant: 'outline',
-    ctaText: 'Get Started',
-    ctaAction: Config.chromeExtensionUrl
-    })}
+        cards.forEach(card =>
+        {
+            // Add hover effect for icon rotation
+            const iconBg = card.querySelector('.icon-bg');
+            if (iconBg)
+            {
+                card.addEventListener('mouseenter', () =>
+                {
+                    iconBg.style.animationDuration = '2s';
+                });
 
-    ${Components.PricingCard({
-    name: Config.pricing.pro.name,
-    price: Config.pricing.pro.price,
-    period: Config.pricing.pro.period,
-    features: Config.pricing.pro.features,
-    variant: 'primary',
-    popular: true,
-    ctaText: 'Upgrade to Pro',
-    ctaAction: Config.stripe.checkoutUrl
-    })}
-</div>
-`
-})}
+                card.addEventListener('mouseleave', () =>
+                {
+                    iconBg.style.animationDuration = '10s';
+                });
+            }
 
-${Components.Footer()}
-`;
+            // Add click animation
+            card.addEventListener('click', function ()
+            {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() =>
+                {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+    },
 
-app.innerHTML = html;
+    animateStats()
+    {
+        const stats = [
+            { element: null, target: 50, suffix: 'K+', current: 0 },
+            { element: null, target: 2, suffix: 'M+', current: 0 },
+            { element: null, target: 4.8, suffix: '', current: 0, decimal: true }
+        ];
 
-// Add background to pricing section
-const pricingSection = Utils.$('#pricing');
-if (pricingSection) {
-pricingSection.style.background = 'var(--gray-50)';
-}
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach((el, index) =>
+        {
+            if (stats[index])
+            {
+                stats[index].element = el;
+            }
+        });
 
-// Handle smooth scrolling for anchor links
-Utils.$$('a[href^="#"]').forEach(link => {
-Utils.on(link, 'click', (e) => {
-e.preventDefault();
-const target = link.getAttribute('href');
-Utils.scrollTo(target);
-});
-});
-}
+        const duration = 2000;
+        const steps = 60;
+        const stepDuration = duration / steps;
+
+        let currentStep = 0;
+        const interval = setInterval(() =>
+        {
+            currentStep++;
+            const progress = currentStep / steps;
+
+            stats.forEach(stat =>
+            {
+                if (stat.element)
+                {
+                    if (stat.decimal)
+                    {
+                        stat.current = (stat.target * progress).toFixed(1);
+                    } else
+                    {
+                        stat.current = Math.floor(stat.target * progress);
+                    }
+                    stat.element.textContent = stat.current + stat.suffix;
+                }
+            });
+
+            if (currentStep >= steps)
+            {
+                clearInterval(interval);
+                // Set final values
+                stats.forEach(stat =>
+                {
+                    if (stat.element)
+                    {
+                        stat.element.textContent = stat.target + stat.suffix;
+                    }
+                });
+            }
+        }, stepDuration);
+    },
+
+    initTestimonials()
+    {
+        // If you add testimonials section later
+        const testimonials = document.querySelectorAll('.testimonial');
+        if (testimonials.length > 0)
+        {
+            let currentIndex = 0;
+
+            setInterval(() =>
+            {
+                testimonials[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % testimonials.length;
+                testimonials[currentIndex].classList.add('active');
+            }, 5000);
+        }
+    },
+
+    render()
+    {
+        // The landing page is already rendered in HTML
+        // This function is here for compatibility with the router
+        // Just ensure navigation is visible
+        const nav = document.getElementById('navigation');
+        if (nav)
+        {
+            nav.classList.remove('hidden');
+        }
+
+        // Initialize landing page features
+        this.init();
+    }
 };

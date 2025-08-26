@@ -5,35 +5,456 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Fokus - Productivity in Your Hands. Block distractions, filter search results, and stay focused.">
-    <title>Fokus - Productivity Chrome Extension</title>
+        content="Fokus - Take control of your digital life. Block distractions, filter search results, and achieve deep focus with our powerful Chrome extension.">
+    <meta name="keywords" content="productivity, chrome extension, website blocker, focus mode, distraction blocker">
+    <title>Fokus - Eliminate Distractions, Amplify Focus</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <!-- Navigation -->
     <nav id="navigation" class="navigation">
         <div class="container">
             <div class="nav-content">
-                <div class="logo">Fokus</div>
+                <a href="/" class="logo">FOKUS</a>
                 <div class="nav-links">
                     <a href="#features" class="nav-link">Features</a>
+                    <a href="#how-it-works" class="nav-link">How It Works</a>
                     <a href="#pricing" class="nav-link">Pricing</a>
-                    <a href="https://chrome.google.com/webstore" class="btn btn-primary btn-sm">Install Extension</a>
+                    <a href="#faq" class="nav-link">FAQ</a>
+                    <a href="https://chrome.google.com/webstore" class="btn btn-primary btn-sm glow">Install Now</a>
+                </div>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
         </div>
     </nav>
 
     <main id="app">
-        <!-- Loading state -->
-        <div class="auth-page">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-background">
+                <div class="grid-pattern"></div>
+                <div class="gradient-orb orb-1"></div>
+                <div class="gradient-orb orb-2"></div>
+                <div class="gradient-orb orb-3"></div>
+            </div>
             <div class="container">
-                <div class="auth-container text-center">
-                    <div class="spinner"></div>
-                    <p>Loading...</p>
+                <div class="hero-content">
+                    <div class="badge-wrapper">
+                        <span class="badge pulse">Now Available</span>
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="gradient-text">Eliminate Distractions.</span>
+                        <br>
+                        <span class="text-white">Amplify Your Focus.</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Transform your browser into a productivity powerhouse. Block distracting websites,
+                        filter search results, and create your perfect digital workspace with Fokus.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="https://chrome.google.com/webstore" class="btn btn-primary btn-lg glow">
+                            Add to Chrome - It's Free
+                        </a>
+                        <a href="#demo" class="btn btn-glass btn-lg">
+                            See It In Action
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-number">50K+</span>
+                            <span class="stat-label">Active Users</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">2M+</span>
+                            <span class="stat-label">Distractions Blocked</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">4.8</span>
+                            <span class="stat-label">Chrome Store Rating</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="section section-dark">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="gradient-text">Powerful Features</span> for Deep Focus
+                    </h2>
+                    <p class="section-subtitle">
+                        Everything you need to create distraction-free browsing environment
+                    </p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card" data-aos="fade-up">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">🚫</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">Smart Website Blocking</h3>
+                        <p class="feature-description">
+                            Instantly block distracting websites with intelligent domain filtering.
+                            Add sites manually or import curated blocklists from the community.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: 10 domains</span>
+                            <span class="limit-badge pro">Pro: Unlimited</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">🔍</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">Search Result Filtering</h3>
+                        <p class="feature-description">
+                            Clean up your Google searches by hiding results containing specific keywords.
+                            Perfect for filtering out clickbait, spoilers, or irrelevant content.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: 10 keywords</span>
+                            <span class="limit-badge pro">Pro: Unlimited</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">📋</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">GitHub Blocklist Import</h3>
+                        <p class="feature-description">
+                            Import massive blocklists from GitHub repositories like Steven Black's hosts.
+                            Instantly block thousands of ads, trackers, and malicious sites.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: 1 URL</span>
+                            <span class="limit-badge pro">Pro: Unlimited</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">⚡</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">Focus Mode</h3>
+                        <p class="feature-description">
+                            Activate deep work sessions with one click. Temporarily block all distracting
+                            sites and create custom focus profiles for different tasks.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: Basic Mode</span>
+                            <span class="limit-badge pro">Pro: Custom Profiles</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">⏱️</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">Time-Based Blocking</h3>
+                        <p class="feature-description">
+                            Schedule when sites should be blocked. Perfect for work hours, study sessions,
+                            or creating healthy digital boundaries.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: Daily Schedule</span>
+                            <span class="limit-badge pro">Pro: Advanced Rules</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                        <div class="feature-icon">
+                            <div class="icon-wrapper">
+                                <div class="icon-bg"></div>
+                                <span class="icon-text">☁️</span>
+                            </div>
+                        </div>
+                        <h3 class="feature-title">Cloud Sync</h3>
+                        <p class="feature-description">
+                            Keep your settings synchronized across all your devices. Your blocklists
+                            and preferences follow you everywhere.
+                        </p>
+                        <div class="feature-limits">
+                            <span class="limit-badge free">Free: 1 device</span>
+                            <span class="limit-badge pro">Pro: 5 devices</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">How It Works</h2>
+                    <p class="section-subtitle">Get started in 3 simple steps</p>
+                </div>
+
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">01</div>
+                        <h3 class="step-title">Install Extension</h3>
+                        <p class="step-description">
+                            Add Fokus to Chrome with one click. No complicated setup or configuration required.
+                        </p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">02</div>
+                        <h3 class="step-title">Configure Your Rules</h3>
+                        <p class="step-description">
+                            Add websites to block, keywords to filter, or import pre-made blocklists from GitHub.
+                        </p>
+                    </div>
+                    <div class="step-connector"></div>
+                    <div class="step">
+                        <div class="step-number">03</div>
+                        <h3 class="step-title">Stay Focused</h3>
+                        <p class="step-description">
+                            Browse distraction-free and watch your productivity soar to new heights.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="section section-gradient">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Simple, Transparent Pricing</h2>
+                    <p class="section-subtitle">Start free, upgrade when you need more power</p>
+                </div>
+
+                <div class="pricing-wrapper">
+                    <div class="pricing-toggle">
+                        <span class="toggle-label active">Monthly</span>
+                        <button class="toggle-switch" id="pricing-toggle">
+                            <span class="toggle-handle"></span>
+                        </button>
+                        <span class="toggle-label">Yearly</span>
+                        <span class="save-badge">Save 20%</span>
+                    </div>
+
+                    <div class="pricing-grid">
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3 class="pricing-name">Free Forever</h3>
+                                <div class="pricing-price">
+                                    <span class="currency">$</span>
+                                    <span class="amount">0</span>
+                                    <span class="period">/month</span>
+                                </div>
+                                <p class="pricing-description">Perfect for getting started</p>
+                            </div>
+
+                            <ul class="pricing-features">
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>10 blocked domains</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>10 filtered keywords</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>1 GitHub blocklist URL</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>Basic Focus Mode</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>1 device sync</span>
+                                </li>
+                                <li class="feature-item disabled">
+                                    <span class="cross"></span>
+                                    <span>Custom focus profiles</span>
+                                </li>
+                                <li class="feature-item disabled">
+                                    <span class="cross"></span>
+                                    <span>Priority support</span>
+                                </li>
+                            </ul>
+
+                            <a href="https://chrome.google.com/webstore" class="btn btn-outline btn-full">
+                                Get Started Free
+                            </a>
+                        </div>
+
+                        <div class="pricing-card featured">
+                            <div class="popular-badge">Most Popular</div>
+                            <div class="pricing-header">
+                                <h3 class="pricing-name">Pro</h3>
+                                <div class="pricing-price">
+                                    <span class="currency">$</span>
+                                    <span class="amount" data-monthly="4.99" data-yearly="3.99">4.99</span>
+                                    <span class="period">/month</span>
+                                </div>
+                                <p class="pricing-description">For power users and professionals</p>
+                            </div>
+
+                            <ul class="pricing-features">
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span><strong>Unlimited</strong> blocked domains</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span><strong>Unlimited</strong> filtered keywords</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span><strong>Unlimited</strong> GitHub blocklists</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>Advanced Focus Mode</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>5 device sync</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>Custom focus profiles</span>
+                                </li>
+                                <li class="feature-item">
+                                    <span class="check"></span>
+                                    <span>Priority support</span>
+                                </li>
+                            </ul>
+
+                            <a href="https://checkout.stripe.com/pay" class="btn btn-primary btn-full glow">
+                                Upgrade to Pro
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                </div>
+
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3 class="faq-question">How does Fokus block websites?</h3>
+                        <p class="faq-answer">
+                            Fokus intercepts requests to distracting websites and redirects you to a
+                            motivational blocked page, keeping you on track with your goals.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3 class="faq-question">Can I temporarily disable blocking?</h3>
+                        <p class="faq-answer">
+                            Yes! You can pause blocking for 5, 15, or 30 minutes, or disable it completely
+                            when you need full access to the internet.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3 class="faq-question">What are GitHub blocklists?</h3>
+                        <p class="faq-answer">
+                            Community-maintained lists of thousands of domains (ads, trackers, adult content, etc.)
+                            that you can import with one click instead of adding sites manually.
+                        </p>
+                    </div>
+
+                    <div class="faq-item">
+                        <h3 class="faq-question">Does it work in Incognito mode?</h3>
+                        <p class="faq-answer">
+                            Yes, if you enable the extension in Incognito mode through Chrome's extension
+                            settings, Fokus will work there too.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to Take Control?</h2>
+                    <p class="cta-subtitle">
+                        Join thousands of users who've transformed their browsing habits
+                    </p>
+                    <a href="https://chrome.google.com/webstore" class="btn btn-primary btn-lg glow">
+                        Install Fokus Now - It's Free
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-brand">
+                        <div class="footer-logo">FOKUS</div>
+                        <p class="footer-tagline">Eliminate distractions, amplify focus.</p>
+                    </div>
+
+                    <div class="footer-links">
+                        <div class="footer-column">
+                            <h4 class="footer-title">Product</h4>
+                            <a href="#features" class="footer-link">Features</a>
+                            <a href="#pricing" class="footer-link">Pricing</a>
+                            <a href="https://chrome.google.com/webstore" class="footer-link">Download</a>
+                        </div>
+
+                        <div class="footer-column">
+                            <h4 class="footer-title">Support</h4>
+                            <a href="#faq" class="footer-link">FAQ</a>
+                            <a href="mailto:support@fokus.app" class="footer-link">Contact</a>
+                            <a href="/docs" class="footer-link">Documentation</a>
+                        </div>
+
+                        <div class="footer-column">
+                            <h4 class="footer-title">Legal</h4>
+                            <a href="/privacy" class="footer-link">Privacy Policy</a>
+                            <a href="/terms" class="footer-link">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Fokus. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
     </main>
 
     <!-- External Dependencies -->
@@ -53,35 +474,13 @@
     <!-- Main Application -->
     <script src="app.js"></script>
 
-    <!-- Initialize App after all scripts are loaded -->
+    <!-- Initialize App -->
     <script>
-        // Ensure all scripts are loaded before initializing
         window.addEventListener('load', function ()
         {
-            // Double-check that all required objects exist
-            if (typeof App !== 'undefined' &&
-                typeof LandingPage !== 'undefined' &&
-                typeof PasswordResetPage !== 'undefined' &&
-                typeof EmailConfirmationPage !== 'undefined')
+            if (typeof App !== 'undefined')
             {
-
-                // Initialize the application
                 App.init();
-            } else
-            {
-                console.error('Required scripts not loaded properly');
-                // Show error to user
-                document.getElementById('app').innerHTML = `
-                    <div class="auth-page">
-                        <div class="container">
-                            <div class="auth-container text-center">
-                                <h2>Loading Error</h2>
-                                <p>Some files failed to load. Please refresh the page.</p>
-                                <button onclick="location.reload()" class="btn btn-primary">Refresh</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
             }
         });
     </script>
